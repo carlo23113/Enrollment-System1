@@ -1,0 +1,41 @@
+body {
+  background-image: url("/images/bg.jpg");
+  height: 90%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.login-container {
+  width: 350px;
+  height: 350px;
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0px auto 0 auto;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 30px 15px 0px 15px;
+}
+
+.container {
+  transition: 2s;
+  opacity: 0;
+  transform: translateY(-150px);
+}
+
+.logo img {
+  margin: -5% auto -5% auto;
+  display: block;
+  width: 40%;
+}
+
+.logo1 img {
+  margin: -2% auto -5% auto;
+  display: block;
+  width: 20%;
+}
+
+.home-container h1 {
+  color: white;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+}
+

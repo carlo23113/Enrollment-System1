@@ -1,0 +1,110 @@
+* {
+  margin: 0;
+  padding: 0%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  font-family: "Kumbh Sans", sans-serif;
+}
+
+body::-webkit-scrollbar {
+  width: 0.2rem;
+}
+
+.nav {
+  height: 100%;
+  width: 80px;
+  position: fixed;
+  background-color: maroon;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.nav #burger {
+  padding: 10px;
+  margin-bottom: 100px;
+}
+
+.nav #burger a :hover {
+  background-color: #833f3f;
+}
+
+#side_nav {
+  height: 100%;
+  width: 80px;
+  background-color: maroon;
+  position: absolute;
+  text-align: left;
+}
+
+#side_nav nav #hamburger {
+  margin-bottom: 100px;
+}
+
+#side_nav nav #hamburger a {
+  color: white;
+}
+
+#side_nav nav #hamburger a i {
+  padding: 18px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+#side_nav nav ul li {
+  margin-bottom: 40px;
+}
+
+#side_nav nav ul li a {
+  color: white;
+  width: 100%;
+}
+
+#side_nav nav ul li a i {
+  padding: 10px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+#side_nav nav ul li a :hover {
+  background-color: #833f3f;
+}
+
+#side_nav nav #hamburger a :hover {
+  background-color: #833f3f;
+}
+
+.nav-item:last-child {
+  margin-top: auto;
+}
+
+.link-text {
+  display: none;
+}
+
+#side_nav:hover {
+  width: 190px;
+}
+
+#side_nav:hover .link-text {
+  display: inline-block;
+}
+
+.sub-menu {
+  display: none;
+}
+
+.nav-item:hover .sub-menu {
+  display: block;
+}
+
+.container {
+  display: inline-block;
+}
+/*# sourceMappingURL=index.css.map */

@@ -1,0 +1,64 @@
+body {
+  height: 90%;
+}
+
+.login-container {
+  width: 80%;
+  height: 80%;
+  color: black;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  margin: 0px auto 0 auto;
+  background: rgba(255, 231, 231, 0.5);
+  padding: 30px 15px 0px 15px;
+}
+
+.logo img {
+  margin: -2% auto -0 auto;
+  display: block;
+  width: 13%;
+}
+
+.home-container h1 {
+  color: white;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  margin-top: 5px;
+}
+
+.nav-bar img {
+  width: 100px;
+}
+.nav-bar {
+  background-color: #800000;
+  color: white;
+}
+
+.nav-bar li a {
+  color: white;
+}
+
+.buttons input {
+  width: 49%;
+  height: 50%;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 35pt;
+  background-color: rgb(133, 40, 40);
+}
+.buttons {
+  text-align: center;
+  margin-top: 25px;
+  border: 0px;
+}
+
+.profile-container{
+  width: 80%;
+  margin: auto;
+  height: 100%;
+  background-color: rgb(250, 223, 223);
+}
+.name-section{
+  width: 100%;
+  height: 10%;
+  background-color: rgb(170, 112, 112);
+  align-items: center;
+  margin: auto;
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/css/index.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="side_nav">
+        <nav class="navbar">
+            <div id="hamburger">
+                <li>
+                    <a>
+                        <i class="fas fa-user"></i>
+                        <span class="link-text">{{#each result}} {{firstname}}{{/each}}</span>
+                    </a>
+                </li>
+            </div>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="/home"><i class="fas fa-home"></i>
+                        <span class="link-text">Home</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href=" /newsfeedpage" class="active"> <i class="fas fa-comment-alt"></i></i>
+                        <span class="link-text">News Feed</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="maintenance"><i class="fas fa-wrench"></i>
+                        <span class="link-text">Maintenance</span></a>
+                    <div class="sub-menu">
+                        <a href="/courses-maintenance"><i class="fas fa-chevron-right"></i></i><span>Courses</span></a>
+
+                        <a href="/sections-maintenance"><br><i
+                                class="fas fa-chevron-right"></i><span>Sections</span></a>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="/students"><i class="fas fa-user-friends"></i>
+                        <span class="link-text">Students</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/logout"><i class="fas fa-sign-out-alt"></i>
+                        <span class="link-text">Log Out</span></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="top-nav">
+        <ul>
+            <li>
+                <div class="logo"><img src="/images/logo.png" alt="" />
+                </div>
+            </li>
+            <li><span style="position:fixed ;">{{#each results}}
+                    {{firstname}}{{/each}}</span></li>
+        </ul>
+
+    </div>
+    <div class="home">
+        <h1 style="margin-bottom: 150px;">Edit Course</h1>
+        {{#each results}}
+        <form action="/update" method="POST" style="width: 40%;margin:auto">
+            <input type="hidden" value="{{id}}" name="id">
+            <div class="form-group">
+                <label for="InputCourseCode">Course Code</label>
+                <input type="text" class="form-control" id="InputCourseCode" value="{{coursecode}}"
+                    name="inputCourseCode">
+            </div>
+            <div class="form-group">
+                <label for="InputCourseDescription">Course Description</label>
+                <input type="text" class="form-control" id="InputCourseDescription" value="{{coursedescription}}"
+                    name="inputCourseDescription">
+            </div>
+
+            <a href="/courses" type="button" class="btn btn-secondary">Back</a>
+            <input type="submit" class="btn btn-primary">
+        </form>
+        {{/each}}
+
+    </div>
+</body>
+
+</html>

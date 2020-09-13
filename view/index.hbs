@@ -1,0 +1,124 @@
+<html>
+
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+    integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+    integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+    crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+  <div class="logo"><img src="/images/logo.png"></div>
+  <!-- Modal for add-->
+  <div class="modal fade" id="add" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="/register" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">ADD COURSE</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="accountType">Account Type</label>
+              <select class="custom-select" id="accountType" name="accountType" required>
+                <option>Choose...</option>
+                <option value="admin">Admin</option>
+                <option value="student">Student</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="InputCourseCode" name="inputFname" placeholder="First Name"
+                required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="InputCourseDescription" name="inputMname"
+                placeholder="Middle Name" required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="InputCourseDescription" name="inputLname"
+                placeholder="Last Name" required>
+            </div>
+            <div class="form-group">
+              <input type="text" class="form-control" id="InputCourseDescription" name="inputUser"
+                placeholder="Username" required>
+            </div>
+            <div class="form-group">
+              <input type="password" class="form-control" id="InputCourseDescription" name="inputPass"
+                placeholder="Password" required>
+            </div>
+
+          </div>
+
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="container" id="bg">
+
+
+    <div class="login-container">
+      <h3>
+        <center>ADMIN LOGIN</center>
+      </h3>
+      <form action="/login" method="POST">
+        <div class="form-group">
+          <label for="exampleInputUsername">Username</label>
+          <input type="text" class="form-control" name="username" id="inputUsername" placeholder="Username" />
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Password</label>
+          <input type="password" class="form-control" name="password" id="inputPassword" placeholder="Password" />
+        </div>
+        {{#if message}}
+        <div style="text-align: center;" class="alert alert-{{message.type}}">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <strong>{{message.intro}}</strong>{{message.message}}
+        </div>
+        {{/if}}
+        <center>
+          <button onclick="login()" type="submit" class="btn btn-danger">LOGIN</button>
+          <!-- Button trigger add modal -->
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add">
+            REGISTER
+          </button><br><br>
+          <a href="studentlogin">Switch to student login</a>
+        </center>
+      </form>
+
+
+    </>
+  </div>
+
+  <script src="anim.js"></script>
+  <script>
+
+        function login() {
+            var username = document.getElementById('inputUsername').value;
+            var password = document.getElementById('inputPassword').value;
+        }
+
+    </script>
+</body>
+
+</html>
