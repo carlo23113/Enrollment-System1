@@ -7,12 +7,14 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
-<body onload="logo()">
+<body style="background-color: rgb(255, 235, 235);">
     <div id="side_nav">
         <nav class="navbar">
             <div id="hamburger">
@@ -38,7 +40,11 @@
                         <span class="link-text">Profile</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href=" /classmates" class="active"><i class="fas fa-users"></i>
+                    {{#each results}}
+                    <input type="hidden" value="{{course}}" id="course" name="course">
+                    <input type="hidden" value="{{section}}" id="section" name="section">
+                    {{/each}}
+                    <a href="javascript:void(0)" id="button" class="active"><i class="fas fa-users"></i>
                         <span class="link-text">Classmates</span></a>
                 </li>
                 <li class="nav-item">
@@ -61,44 +67,42 @@
         </ul>
 
     </div>
-    <div class="home">
+    <div class="newsfeed">
+        <h1 style="margin: 20px;">Classmates</h1>
         <div class="tables">
             <table class="table">
                 <thead class="thead-dark">
                     <tr>
-                        <th scope="col">#</th>
                         <th scope="col">Fullname</th>
                         <th scope="col">Course</th>
                         <th scope="col">Section</th>
-                        <th scope="col">Date Enrolled</th>
-                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {{#each students}}
-                    <input type="hidden" value="{{coursecode}}" name="course">
+                    {{#each classmates}}
                     <tr>
-                        <th scope="row">{{id}}</th>
-                        <td>{{fullname}}</td>
+                        <th scope="row">{{fullname}}</th>
                         <td>{{course}}</td>
                         <td>{{section}}</td>
-                        <td>{{date}}</td>
-                        <td><a href="addsection/{{id}}/{{course}}" class="btn btn-success">ADD SECTION</a>
-                            <a href="deleteStudent/{{id}}" class="btn btn-danger">DELETE</a></td>
                     </tr>
                     {{/each}}
                 </tbody>
             </table>
-            {{#if message}}
-            <div style="text-align: center;" class="alert alert-{{message.type}}">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <strong>{{message.intro}}</strong>{{message.message}}
-            </div>
-            {{/if}}
         </div>
 
     </div>
+    <script>
+        $('#button').on('click', function () {
+            classmates();
+        });
+        const course = document.getElementById('course').value;
+        const section = document.getElementById('section').value;
 
+
+        function classmates() {
+            window.location.href = "/classmates?course=" + course + "&section=" + section;
+        }
+    </script>
 </body>
 
 </html>

@@ -10,9 +10,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
-<body style="background-color: rgb(255, 235, 235);">
+<body style="background-color: rgb(255, 235, 235);" onload="fade()">
     <div id="side_nav">
         <nav class="navbar">
             <div id="hamburger">
@@ -48,6 +49,10 @@
                         <span class="link-text">Students</span></a>
                 </li>
                 <li class="nav-item">
+                    <a href="/viewPendings"><i class="fas fa-user-clock"></i>
+                        <span class="link-text">Pendings</span></a>
+                </li>
+                <li class="nav-item">
                     <a href="/logout"><i class="fas fa-sign-out-alt"></i>
                         <span class="link-text">Log Out</span></a>
                 </li>
@@ -57,7 +62,7 @@
     <div class="top-nav">
         <div class="logo"><img src="/images/logo.png" alt="" /></div>
     </div>
-    <div class="newsfeed">
+    <div class="newsfeed" id="body" style="opacity: 0;transition: 1s">
         <h1 style="text-align: center;margin-top: 20px">News Feed</h1>
         <div class="header">
             <form action="/newsfeed" method="POST">
@@ -104,6 +109,10 @@
         function topFunction() {
             document.body.scrollTop = 0;
             document.documentElement.scrollTop = 0;
+        }
+
+        function fade() {
+            document.getElementById('body').style.opacity = 1;
         }
     </script>
 </body>

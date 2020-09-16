@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body style="background-color: rgb(255, 235, 235);">
@@ -38,7 +40,11 @@
                         <span class="link-text">Profile</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href=" /classmates" class="active"><i class="fas fa-users"></i>
+                    {{#each results}}
+                    <input type="hidden" value="{{course}}" id="course" name="course">
+                    <input type="hidden" value="{{section}}" id="section" name="section">
+                    {{/each}}
+                    <a href="javascript:void(0)" id="button" class="active"><i class="fas fa-users"></i>
                         <span class="link-text">Classmates</span></a>
                 </li>
                 <li class="nav-item">
@@ -68,9 +74,9 @@
             <strong>{{message.intro}}</strong>{{message.message}}
         </div>
         {{/if}}
-        <div class="enrollment-form" id="form">
+        <div class="enrollment-form" id="form" style="margin-left:80px;">
             <h1 style="margin-bottom: 30px;">ENROLLMENT FORM</h1>
-            <form action="/enroll-submit" method="POST" style="width: 50%; margin:auto;">
+            <form action="/enroll-submit" method="POST" style="width: 80vw;margin:auto">
                 {{#each results}}
                 <div class=" form-group">
                     <label for="InputFirstname">First Name</label>
@@ -86,6 +92,11 @@
                     <label for="InputMiddlename">Last Name</label>
                     <input type="text" class="form-control" id="InputLastname" name="inputLname" placeholder="Last Name"
                         value="{{lastname}}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="InputCourse">Course</label>
+                    <input type="text" class="form-control" id="InputCourse" name="inputCourse" placeholder="Course"
+                        value="{{course}}" disabled>
                 </div>
 
                 <div class="form-group">
@@ -103,23 +114,36 @@
                     <input type="text" class="form-control" id="InputAddress" name="inputAddress" value="{{address}}"
                         placeholder="Address" required>
                 </div>
+                
+                <input type="submit" class="btn btn-primary" value="Enroll" style="margin-bottom:20px">
+                
                 {{/each}}
-                <div class="form-group">
-                    <label for="InputCourse">Course</label>
-                    <select class="custom-select" id="InputCourse" name="inputCourse" value="{{course}}" required>
-                        <option>Choose...</option>
-                        {{#each courses}}
-                        <option value="{{coursecode}}">{{coursecode}}</option>
-                        {{/each }}
-                    </select>
-                </div>
-
-                <input type="submit" class="btn btn-primary" value="Enroll">
-                </button>
             </form>
+            {{#each results}}
+            <input type="hidden" class="form-control" id="course" name="inputCourse" placeholder="Course" value="{{course}}">
+            {{/each}}
+            <button onclick="enrollSubjects()" class="btn btn-primary" style="margin-bottom:20px">Add Subjects</button>
         </div>
 
     </div>
+    <script>
+        $('#button').on('click', function () {
+            classmates();
+        });
+        const course = document.getElementById('course').value;
+        const section = document.getElementById('section').value;
+
+
+        function classmates() {
+            window.location.href = "/classmates?course=" + course + "&section=" + section;
+        }
+
+        function enrollSubjects(){
+            var course = document.getElementById("course").value;
+            window.location.href = "/enrollSubject?course="+course;
+        }
+
+    </script>
 </body>
 
 </html>

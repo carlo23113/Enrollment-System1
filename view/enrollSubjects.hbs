@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="/css/index.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
+</head>
+
+<body onload="logo()">
+    <div id="side_nav">
+        <nav class="navbar">
+            <div id="hamburger">
+                <li>
+                    <a>
+                        <i class="fas fa-user"></i>
+                        <span class="link-text">{{#each results}} {{firstname}}{{/each}}</span>
+                    </a>
+                </li>
+            </div>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="/homeStudent"><i class="fas fa-home"></i>
+                        <span class="link-text">Home</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href=" /newsfeedpageStudent" class="active"> <i class="fas fa-comment-alt"></i>
+                        <span class="link-text">News Feed</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href=" /profileStudent" class="active"><i class="fas fa-user-circle"></i>
+                        <span class="link-text">Profile</span></a>
+                </li>
+                <li class="nav-item">
+                    {{#each results}}
+                    <input type="hidden" value="{{course}}" id="course" name="course">
+                    <input type="hidden" value="{{section}}" id="section" name="section">
+                    {{/each}}
+                    <a href="javascript:void(0)" id="button" class="active"><i class="fas fa-users"></i>
+                        <span class="link-text">Classmates</span></a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/enroll"><i class="fas fa-address-card"></i>
+                        <span class="link-text">Enroll Now</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/logout"><i class="fas fa-sign-out-alt"></i>
+                        <span class="link-text">Log Out</span></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="top-nav">
+        <ul>
+            <li>
+                <div class="logo"><img src="/images/logo.png" alt="" />
+                </div>
+            </li>
+        </ul>
+
+    </div>
+    <div class="home">
+        <h1>Available Subjects</h1>
+        <div class="tables">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Course</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Schedule</th>
+                        <th scope="col">No. of units</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each subjects}}
+                    <tr>
+
+                        <th scope="row">{{id}}</th>
+                        <td>{{subject}}</td>
+                        <td>{{course}}</td>
+                        <td>{{section}}</td>
+                        <td>{{day}} {{start}}-{{finish}}</td>
+                        <td>{{unit}}</td>
+
+
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <div class="addSubject" style="background-color:rgb(231, 193, 193); padding: 1px; margin-top: 50px">
+                <form action="/enrollSubjectStudent" method="POST" style="margin: 50px auto; width: 40vw; ">
+                <h4>Enroll your subjects</h4>
+                
+                <div class="form-group row">
+                    <select class="form-control" name="subject">
+                        <option>Choose a subject..</option>
+                        {{#each subjects}}<option>{{subject}}</option>{{/each}}
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-success">ADD</button>
+            </form>
+
+            </div>
+            
+            <div class="yourSubjects" style="margin-top: 50px;">
+
+            <table class="table" style="width: 50vw; margin: auto;">
+                <h5>Your subjects</h5>
+                <thead>
+                    <tr>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Section</th>
+                        <th scope="col">Schedule</th>
+                        <th scope="col">No. of units</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each studentSubjects}}
+                    <tr>
+                        <td>{{subject}}</td>
+                        <td>{{section}}</td>
+                        <td>{{day}} {{start}}-{{finish}}</td>
+                        <td>{{unit}}</td>
+                        <td><a href="deleteStudSubject/{{id}}" class="btn btn-danger">DELETE</a></td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><b>Total units:</b> </td>
+                        <td>{{#each totalUnits}}{{units}}{{/each}}</td>
+                    </tr>
+                </tbody>
+            </table>
+                {{#if message}}
+                    <div style="text-align: center;" class="alert alert-{{message.type}}">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <strong>{{message.intro}}</strong>
+                    </div>
+                {{/if}}
+        </div>
+            
+        </div>
+
+    </div>
+
+    <script>
+
+        $('#button').on('click', function () {
+            classmates();
+        });
+        const course = document.getElementById('course').value;
+        const section = document.getElementById('section').value;
+
+
+        function classmates() {
+            window.location.href = "/classmates?course=" + course + "&section=" + section;
+        }
+
+    </script>
+</body>
+
+</html>

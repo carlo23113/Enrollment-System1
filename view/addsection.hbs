@@ -10,6 +10,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body style="background-color: rgb(255, 235, 235);">
@@ -48,6 +49,10 @@
                         <span class="link-text">Students</span></a>
                 </li>
                 <li class="nav-item">
+                    <a href="/viewPendings"><i class="fas fa-user-clock"></i>
+                        <span class="link-text">Pendings</span></a>
+                </li>
+                <li class="nav-item">
                     <a href="/logout"><i class="fas fa-sign-out-alt"></i>
                         <span class="link-text">Log Out</span></a>
                 </li>
@@ -82,18 +87,9 @@
                             <th scope="row">{{id}}</th>
                             <td>{{fullname}}</td>
                             <td>{{course}}</td>
-                            <td>
-                                {{/each}}
-                                <select class="form-control" id="sortCourse" name="section">
-                                    <option>Course</option>
-                                    {{#each section}}
-                                    <option value="{{section}}">{{section}}</option>
-                                    {{/each}}
-                                </select>
-                            </td>
-                            {{#each results}}
+                            <td>{{section}}</td>
                             <td>{{date}}</td>
-                            <td><input type="submit" class="btn btn-success" value="SAVE">
+                            <td><input type="submit" class="btn btn-success" value="APPROVE">
                     </form>
                     </tr>
                     {{/each}}

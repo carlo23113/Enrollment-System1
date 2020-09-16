@@ -10,6 +10,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body>
@@ -48,6 +49,10 @@
                         <span class="link-text">Students</span></a>
                 </li>
                 <li class="nav-item">
+                    <a href="/viewPendings"><i class="fas fa-user-clock"></i>
+                        <span class="link-text">Pendings</span></a>
+                </li>
+                <li class="nav-item">
                     <a href="/logout"><i class="fas fa-sign-out-alt"></i>
                         <span class="link-text">Log Out</span></a>
                 </li>
@@ -65,8 +70,8 @@
         </ul>
 
     </div>
-    <div class="home">
-        <h1 style="margin-bottom: 150px;">Edit Section</h1>
+    <div class="home" style="margin-left: 30px;">
+        <h1 style=" margin-bottom: 50px;">Edit Section</h1>
         {{#each results}}
         <form action="/update-section" method="POST" style="width: 40%;margin:auto">
             <input type="hidden" value="{{id}}" name="id">

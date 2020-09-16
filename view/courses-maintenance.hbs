@@ -19,6 +19,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Carlo University</title>
+  <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body>
@@ -56,6 +57,10 @@
             <span class="link-text">Students</span></a>
         </li>
         <li class="nav-item">
+                    <a href="/viewPendings"><i class="fas fa-user-clock"></i>
+                        <span class="link-text">Pendings</span></a>
+                </li>
+        <li class="nav-item">
           <a href="/logout"><i class="fas fa-sign-out-alt"></i>
             <span class="link-text">Log Out</span></a>
         </li>
@@ -65,8 +70,8 @@
   <div class="top-nav">
     <div class="logo"><img src="/images/logo.png" alt="" /></div>
   </div>
-  <div class="newsfeed">
-    <h1 style="margin: 20px">Courses</h1>
+  <div class="home">
+    <h1 style="margin-left: -80px;">Course</h1>
 
     <div class="tables">
       <table class="table">
@@ -82,13 +87,17 @@
         <tbody>
           {{#each result}}
           <tr>
+
             <th scope="row">{{id}}</th>
-            <td>{{coursecode}}</td>
+            <td><input onclick = "setCourse('{{coursecode}}')" type="button" value="{{coursecode}}" id="course"></td>
             <td>{{coursedescription}}</td>
+
             <td>{{date}}</td>
+
             <td><a href="edit/{{id}}" class="btn btn-success">EDIT</a>
               <a href="delete/{{id}}" class="btn btn-danger">DELETE</a></td>
           </tr>
+          
           {{/each}}
         </tbody>
       </table>
@@ -142,6 +151,12 @@
     </div>
 
   </div>
+  <script>
+        function setCourse(course1) {
+            var course = document.getElementById('course').value;
+            window.location.href = "/subjects?course=" + course1;
+        }
+  </script>
 </body>
 
 </html>

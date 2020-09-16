@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
         integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body style="background-color: rgb(255, 235, 235);" onload="fade()">
@@ -38,7 +40,11 @@
                         <span class="link-text">Profile</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href=" /classmates" class="active"><i class="fas fa-users"></i>
+                    {{#each results}}
+                    <input type="hidden" value="{{course}}" id="course" name="course">
+                    <input type="hidden" value="{{section}}" id="section" name="section">
+                    {{/each}}
+                    <a href="javascript:void(0)" id="button" class="active"><i class="fas fa-users"></i>
                         <span class="link-text">Classmates</span></a>
                 </li>
                 <li class="nav-item">
@@ -55,7 +61,7 @@
     <div class="top-nav">
         <div class="logo"><img src="/images/logo.png" alt="" /></div>
     </div>
-    <div class="newsfeedStudent" id="body" style="opacity: 0;transition: 1s">
+    <div class="newsfeed" id="body" style="opacity: 0;transition: 1s;">
         <h1 style="text-align: center;margin-top: 20px">News Feed</h1>
         <div class="header">
             <form action="/newsfeedStudent" method="POST">
@@ -82,6 +88,17 @@
                 class="far fa-arrow-alt-circle-up"></i></button>
 
         <script>
+            $('#button').on('click', function () {
+                classmates();
+            });
+            const course = document.getElementById('course').value;
+            const section = document.getElementById('section').value;
+
+
+            function classmates() {
+                window.location.href = "/classmates?course=" + course + "&section=" + section;
+            }
+
             //Get the button
             var mybutton = document.getElementById("myBtn");
 

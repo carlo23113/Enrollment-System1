@@ -6,8 +6,11 @@ const sql = require("mysql");
 const path = require("path");
 const hbs = require("hbs");
 const ejs = require("ejs");
+const { check, validationResult } = require("express-validator");
 const { SSL_OP_EPHEMERAL_RSA } = require("constants");
+const { start } = require("repl");
 const TWO_HOURS = 1000 * 60 * 60 * 2;
+
 const {
   port = 3000,
   SESS_LIFETIME = TWO_HOURS,
@@ -102,6 +105,8 @@ app.get("/", redirectHome, (req, res) => {
   const { userId } = req.session;
   const { userStudent } = req.session;
   const { pass } = req.session;
+  const { section } = req.session;
+  const { course } = req.session;
   console.log(req.session);
   res.render("index");
 });
@@ -199,14 +204,23 @@ app.post("/loginstudent", redirectHome, (req, res) => {
       [username, password],
       function (err, results, fields) {
         if (results.length > 0) {
-          req.session.loggedin = true;
-          req.session.userId = username;
-          req.session.pass = password;
-          console.log("succesfully login");
-          console.log(username);
-          res.render("home-student", {
-            results: results,
-          });
+          const status = results[0].status;
+          if (status != "approved") {
+            req.session.message = {
+              type: "danger",
+              intro: "Your account is not approved yet please try again later",
+            };
+            res.redirect("/studentlogin");
+          } else {
+            req.session.loggedin = true;
+            req.session.userId = username;
+            req.session.pass = password;
+            console.log("succesfully login");
+            console.log(username);
+            res.render("home-student", {
+              results: results,
+            });
+          }
         } else {
           console.log("Incorrect username or password");
           req.session.message = {
@@ -239,7 +253,12 @@ app.get("/logout", redirectLogin, (req, res) => {
 });
 
 app.get("/studentlogin", redirectHome, (req, res) => {
-  res.render("index-student");
+  con.query("SELECT * FROM courses", (err, courses, fields) => {
+    if (err) throw err;
+    res.render("index-student", {
+      courses: courses,
+    });
+  });
 });
 
 app.get("/courses-maintenance", redirectLogin, (req, res) => {
@@ -328,8 +347,11 @@ app.get("/sections1", (req, res) => {
 
 //view students and course
 app.get("/viewStudents", redirectLogin, (req, res) => {
+  let approved = "approved";
   let sql =
-    "SELECT id, CONCAT(firstname,' ',middlename,' ',lastname) AS fullname, course, section, date FROM students";
+    "SELECT id, CONCAT(firstname,' ',middlename,' ',lastname) AS fullname, course, section, date FROM students where status = '" +
+    approved +
+    "'";
   con.query(sql, function (err, students, fields) {
     if (err) throw err;
 
@@ -384,6 +406,7 @@ app.get("/sortCourse", redirectLogin, (req, res) => {
 //register student and admin
 app.post("/register", redirectHome, (req, res) => {
   let accounttype = req.body.accountType;
+  let pending = "pending";
   let data = {
     firstname: req.body.inputFname,
     middlename: req.body.inputMname,
@@ -391,9 +414,18 @@ app.post("/register", redirectHome, (req, res) => {
     username: req.body.inputUser,
     password: req.body.inputPass,
   };
+  let data1 = {
+    status: pending,
+    firstname: req.body.inputFname,
+    middlename: req.body.inputMname,
+    lastname: req.body.inputLname,
+    course: req.body.inputCourse,
+    username: req.body.inputUser,
+    password: req.body.inputPass,
+  };
   if (accounttype == "student") {
     let sql = "INSERT INTO students SET ?";
-    let query = con.query(sql, data, (err, result) => {
+    let query = con.query(sql, data1, (err, result) => {
       if (err) throw err;
       else {
         console.log("Registered Successfully!");
@@ -402,7 +434,7 @@ app.post("/register", redirectHome, (req, res) => {
           type: "danger",
           intro: "Registered Successfully!",
         };
-        res.redirect("/");
+        res.redirect("/studentlogin");
       }
     });
   } else if (accounttype == "admin") {
@@ -657,9 +689,7 @@ app.post("/enroll-submit", (req, res) => {
     birthdate +
     "' , address = '" +
     address +
-    "' , course = '" +
-    course +
-    "' , date = '" +
+    "'  , date = '" +
     date +
     "' WHERE username = '" +
     username +
@@ -691,9 +721,8 @@ app.get("/profile-student", (req, res) => {
 });
 
 //edit course
-app.get("/addsection/:id/:course", (req, res) => {
+app.get("/approveStudent/:id", (req, res) => {
   const id = req.params.id;
-  const course = req.params.course;
   let sql =
     "SELECT id, CONCAT(firstname,' ',middlename,' ',lastname) AS fullname, course, section, date FROM students WHERE id = '" +
     id +
@@ -701,15 +730,8 @@ app.get("/addsection/:id/:course", (req, res) => {
   con.query(sql, (err, results) => {
     if (err) throw err;
 
-    const course = req.params.course;
-    sql = "SELECT section from sections WHERE course = '" + course + "'";
-    con.query(sql, (err, section) => {
-      if (err) throw err;
-
-      res.render("addsection", {
-        results: results,
-        section: section,
-      });
+    res.render("addsection", {
+      results: results,
     });
   });
 });
@@ -717,8 +739,8 @@ app.get("/addsection/:id/:course", (req, res) => {
 //update section
 app.post("/save-section", (req, res) => {
   const id = req.body.id;
-  let sql =
-    "UPDATE students SET section = '" + req.body.section + "' where id = " + id;
+  const status = "approved";
+  let sql = "UPDATE students SET status = '" + status + "' where id = " + id;
   let query = con.query(sql, (err, results) => {
     if (err) throw err;
     else {
@@ -839,6 +861,557 @@ app.get("/profileStudent", (req, res) => {
       res.render("profileStudent", {
         result: result,
       });
+    }
+  );
+});
+
+app.get("/classmates", (req, res) => {
+  let user = req.session.userId;
+  let pass = req.session.pass;
+  let course = req.param("course");
+  let section = req.param("section");
+  con.query(
+    "SELECT CONCAT(firstname,' ', middlename,' ', lastname) AS fullname, course, section FROM students where course = '" +
+      course +
+      "' AND section = '" +
+      section +
+      "' and username != '" +
+      user +
+      "' AND " +
+      "password != '" +
+      pass +
+      "'",
+    (err, classmates, fields) => {
+      if (err) throw err;
+
+      const username = req.session.userId;
+      const password = req.session.pass;
+      con.query(
+        "SELECT * FROM students WHERE username = '" +
+          username +
+          "' AND password = '" +
+          password +
+          "'",
+        (err, results, fields) => {
+          if (err) throw err;
+          res.render("classmates", {
+            classmates: classmates,
+            results: results,
+          });
+        }
+      );
+    }
+  );
+});
+
+//viewing of subjects per course
+app.get("/subjects", (req, res) => {
+  let course = req.param("course");
+  console.log(course);
+  con.query(
+    "SELECT * from subjects where course = '" + course + "'",
+    (err, result, fields) => {
+      if (err) throw err;
+
+      const username = req.session.userId;
+      const password = req.session.pass;
+      con.query(
+        "SELECT * FROM adminaccounts WHERE username = '" +
+          username +
+          "' AND password = '" +
+          password +
+          "'",
+        (err, results, fields) => {
+          if (err) throw err;
+
+          con.query(
+            "SELECT section from sections where course = '" + course + "'",
+            (err, section, fields) => {
+              if (err) throw err;
+
+              con.query(
+                "SELECT coursecode from courses WHERE coursecode = '" +
+                  course +
+                  "'",
+                (err, course, fields) => {
+                  if (err) throw err;
+                  res.render("subject-maintenance", {
+                    results: results,
+                    result: result,
+                    section: section,
+                    course: course,
+                  });
+                }
+              );
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+app.post("/addSubject", (req, res) => {
+  let course = req.param("course");
+  let data = {
+    subject: req.body.inputSubject,
+    course: req.body.inputCourse,
+    section: req.body.inputSection,
+    day: req.body.inputDay,
+    start: req.body.inputFrom,
+    finish: req.body.inputTo,
+    unit: req.body.inputUnit,
+  };
+  let sql = "INSERT INTO subjects SET ?";
+  con.query(sql, data, (err, result, fields) => {
+    if (err) throw err;
+    else {
+      console.log("Successfully added record in the database!");
+
+      req.session.message = {
+        type: "danger",
+        intro: "Subject Successfully Added!",
+      };
+      res.redirect("/subjects?course=" + course);
+    }
+  });
+});
+
+//delete subject
+app.get("/deleteSubject/:id/:course", (req, res) => {
+  const course = req.params.course;
+  const id = req.params.id;
+  console.log(course);
+  let sql = "DELETE FROM subjects WHERE id = '" + id + "'";
+  let query = con.query(sql, (err, result) => {
+    if (err) throw err;
+    else {
+      req.session.message = {
+        type: "danger",
+        intro: "Record successfully deleted",
+      };
+    }
+    res.redirect("/subjects?course=" + course);
+  });
+});
+
+app.get("/editSubject/:id/:course", (req, res) => {
+  const id = req.params.id;
+  const course = req.params.course;
+  let sql = "SELECT * FROM subjects WHERE id = '" + id + "'";
+  let query = con.query(sql, (err, results) => {
+    if (err) throw err;
+
+    const username = req.session.userId;
+    const password = req.session.pass;
+    con.query(
+      "SELECT * FROM adminaccounts WHERE username = '" +
+        username +
+        "' AND password = '" +
+        password +
+        "'",
+      (err, result, fields) => {
+        if (err) throw err;
+
+        con.query(
+          "SELECT section from sections WHERE course = '" + course + "'",
+          (err, section, fields) => {
+            if (err) throw err;
+            res.render("editSubject", {
+              results: results,
+              result: result,
+              section: section,
+            });
+          }
+        );
+      }
+    );
+  });
+});
+
+//update course
+app.post("/editSubject1", (req, res) => {
+  const id = req.body.id;
+  const subject = req.body.inputSubject;
+  const course = req.body.inputCourse;
+  const section = req.body.inputSection;
+  const day = req.body.inputDay;
+  const from = req.body.inputFrom;
+  const to = req.body.inputTo;
+  const unit = req.body.inputUnit;
+  let sql =
+    "UPDATE subjects SET subject = '" +
+    subject +
+    "', course = '" +
+    course +
+    "', section = '" +
+    section +
+    "', day = '" +
+    day +
+    "', start = '" +
+    from +
+    "', finish = '" +
+    to +
+    "', unit = " +
+    unit +
+    " where id = " +
+    id;
+  let query = con.query(sql, (err, results) => {
+    if (err) throw err;
+    else {
+      req.session.message = {
+        type: "danger",
+        intro: "Record successfully edited",
+      };
+    }
+    res.redirect("/subjects?course=" + course);
+  });
+});
+
+//view pendings
+app.get("/viewPendings", redirectLogin, (req, res) => {
+  let pending = "pending";
+  let sql =
+    "SELECT id, CONCAT(firstname,' ',middlename,' ',lastname) AS fullname, course, section, date FROM students where status = '" +
+    pending +
+    "'";
+  con.query(sql, function (err, students, fields) {
+    if (err) throw err;
+
+    const username = req.session.userId;
+    const password = req.session.pass;
+    con.query(
+      "SELECT * FROM adminaccounts WHERE username = '" +
+        username +
+        "' AND password = '" +
+        password +
+        "'",
+      (err, results, fields) => {
+        if (err) throw err;
+
+        sql = "SELECT coursecode from courses";
+        con.query(sql, function (err, courses, fields) {
+          if (err) throw err;
+          res.render("pending-students", {
+            results: results,
+            students: students,
+            courses: courses,
+          });
+        });
+      }
+    );
+  });
+});
+
+//enroll subjects
+app.get("/enrollSubject", redirectLogin, (req, res) => {
+  let course = req.param("course");
+  const username = req.session.userId;
+  const password = req.session.pass;
+  con.query(
+    "SELECT * FROM subjects where course = '" + course + "' ORDER BY start ASC",
+    (err, subjects, fields) => {
+      if (err) throw err;
+
+      con.query(
+        "SELECT * FROM students WHERE username = '" +
+          username +
+          "' AND password = '" +
+          password +
+          "'",
+        (err, results, fields) => {
+          if (err) throw err;
+
+          con.query(
+            "SELECT CONCAT(firstname,' ',middlename,' ',lastname) AS fullname FROM students WHERE username = '" +
+              username +
+              "' AND password = '" +
+              password +
+              "'",
+            (err, fullname, fields) => {
+              if (err) throw err;
+              const studName = fullname[0].fullname;
+              con.query(
+                "SELECT * FROM student_subjects where student_name = '" +
+                  studName +
+                  "' ORDER BY start ASC",
+                (err, studentSubjects, fields) => {
+                  if (err) throw err;
+
+                  con.query(
+                    "SELECT units FROM students WHERE username = '" +
+                      username +
+                      "' AND password = '" +
+                      password +
+                      "'",
+                    (err, totalUnits, fields) => {
+                      if (err) throw err;
+                      console.log(subjects);
+                      for (var x = 0; x < subjects.length; x++) {
+                        var date = new Date();
+                        var startTime = new Date(
+                          date.toLocaleDateString() + " " + subjects[x].start
+                        ).toLocaleTimeString();
+                        var finalTime = new Date(
+                          date.toLocaleDateString() + " " + subjects[x].finish
+                        ).toLocaleTimeString();
+                        subjects[x].start = startTime;
+                        subjects[x].finish = finalTime;
+                      }
+                      for (var x = 0; x < studentSubjects.length; x++) {
+                        var date = new Date();
+                        var startTime = new Date(
+                          date.toLocaleDateString() +
+                            " " +
+                            studentSubjects[x].start
+                        ).toLocaleTimeString();
+                        var finalTime = new Date(
+                          date.toLocaleDateString() +
+                            " " +
+                            studentSubjects[x].finish
+                        ).toLocaleTimeString();
+                        studentSubjects[x].start = startTime;
+                        studentSubjects[x].finish = finalTime;
+                      }
+                      console.log(studentSubjects);
+                      res.render("enrollSubjects", {
+                        subjects: subjects,
+                        results: results,
+                        studentSubjects: studentSubjects,
+                        totalUnits: totalUnits,
+                      });
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
+    }
+  );
+});
+
+//delete student subject
+app.get("/deleteStudSubject/:id", (req, res) => {
+  const username = req.session.userId;
+  const password = req.session.pass;
+  const id = req.params.id;
+
+  con.query(
+    "SELECT units from students where username = '" +
+      username +
+      "' AND password = '" +
+      password +
+      "'",
+    (err, total, fields) => {
+      if (err) throw err;
+      const totalUnits = total[0].units;
+
+      con.query(
+        "SELECT * from student_subjects WHERE id = '" + id + "'",
+        (err, subject, fields) => {
+          if (err) throw err;
+          const sub = subject[0].unit;
+          const courses = subject[0].course;
+          console.log(courses);
+
+          let sql = "DELETE FROM student_subjects WHERE id = '" + id + "'";
+          let query = con.query(sql, (err, result) => {
+            if (err) throw err;
+            else {
+              req.session.message = {
+                type: "danger",
+                intro: "Record successfully deleted",
+              };
+            }
+            const minusUnits = totalUnits - sub;
+            con.query(
+              "UPDATE students SET units = '" +
+                minusUnits +
+                "' WHERE username = '" +
+                username +
+                "' AND password  = '" +
+                password +
+                "'",
+              (err, tUnits) => {
+                if (err) throw err;
+                res.redirect("/enrollSubject?course=" + courses);
+              }
+            );
+          });
+        }
+      );
+      //res.redirect("/enrollSubject?course=" + courses);
+    }
+  );
+});
+
+//submit enrolled subjects
+app.post("/enrollSubjectStudent", redirectLogin, (req, res) => {
+  const username = req.session.userId;
+  const password = req.session.pass;
+  let subject = req.body.subject;
+  con.query(
+    "SELECT age, CONCAT(firstname,' ',middlename,' ',lastname) AS fullname from students where username = '" +
+      username +
+      "' AND password = '" +
+      password +
+      "'",
+    (err, fullname, fields) => {
+      const studName = fullname[0].fullname;
+      if (err) return err;
+      con.query(
+        "SELECT units from students where username = '" +
+          username +
+          "' AND password = '" +
+          password +
+          "'",
+        (err, total, fields) => {
+          if (err) throw err;
+
+          const studUnits = total[0].units;
+
+          con.query(
+            "SELECT subject, course, section, unit, day, start, finish FROM subjects WHERE subject = '" +
+              subject +
+              "'",
+            (err, infos, fields) => {
+              if (err) throw err;
+              const c = infos[0].course;
+              const sec = infos[0].section;
+              const unt = infos[0].unit;
+              const d = infos[0].day;
+              const s = infos[0].start;
+              const f = infos[0].finish;
+
+              let data = {
+                student_name: studName,
+                subject: subject,
+                course: c,
+                section: sec,
+                day: d,
+                start: s,
+                finish: f,
+                unit: unt,
+              };
+              const newUnits = studUnits + unt;
+
+              con.query(
+                "SELECT subject from student_subjects WHERE student_name = '" +
+                  studName +
+                  "' AND subject = '" +
+                  subject +
+                  "'",
+                (err, allSubs, fields) => {
+                  if (err) throw err;
+
+                  con.query(
+                    "SELECT day, start, finish FROM student_subjects where student_name = '" +
+                      studName +
+                      "' AND day = '" +
+                      d +
+                      "'",
+                    (err, schedule, fields) => {
+                      if (err) throw err;
+                      console.log(schedule);
+                      if (allSubs.length == 0) {
+                        for (var i = 0; i < schedule.length; i++) {
+                          let date = new Date();
+                          var startTime = new Date(
+                            date.toLocaleDateString() + " " + schedule[i].start
+                          );
+                          var finishTime = new Date(
+                            date.toLocaleDateString() + " " + schedule[i].finish
+                          );
+                          var nstartTime = new Date(
+                            date.toLocaleDateString() + " " + s
+                          );
+                          var nfinishTime = new Date(
+                            date.toLocaleDateString() + " " + f
+                          );
+                          console.log(
+                            startTime.toString() + " " + nstartTime.toString()
+                          );
+                          if (
+                            startTime.toString() == nstartTime.toString() &&
+                            finishTime.toString() == nfinishTime.toString()
+                          ) {
+                            console.log("conflict");
+                            req.session.message = {
+                              type: "danger",
+                              intro:
+                                "You cannot take this subject please choose another one.",
+                            };
+                            return res.redirect("/enrollSubject?course=" + c);
+                          } else if (
+                            (nstartTime > startTime &&
+                              nstartTime < finishTime) ||
+                            (nfinishTime > startTime &&
+                              nfinishTime < finishTime) ||
+                            (nstartTime.toString() == startTime.toString() &&
+                              startTime < finishTime) ||
+                            (nstartTime < startTime && nfinishTime > finishTime)
+                          ) {
+                            console.log("conflict");
+                            req.session.message = {
+                              type: "danger",
+                              intro:
+                                "You cannot take this subject please choose another one.",
+                            };
+                            return res.redirect("/enrollSubject?course=" + c);
+                          }
+                        }
+
+                        if (newUnits < 25) {
+                          let sql = "INSERT INTO student_subjects SET ? ";
+                          con.query(sql, data, (err, results) => {
+                            if (err) throw err;
+
+                            const addUnits = studUnits + unt;
+                            con.query(
+                              "UPDATE students SET units = '" +
+                                addUnits +
+                                "' WHERE username = '" +
+                                username +
+                                "' AND password = '" +
+                                password +
+                                "'",
+                              (err, tUnits) => {
+                                if (err) throw err;
+                                req.session.message = {
+                                  type: "danger",
+                                  intro: "Subject successfully added.",
+                                };
+                                res.redirect("/enrollSubject?course=" + c);
+                              }
+                            );
+                          });
+                        } else {
+                          req.session.message = {
+                            type: "danger",
+                            intro:
+                              "Your total units exceeded please choose other subject.",
+                          };
+                          res.redirect("/enrollSubject?course=" + c);
+                        }
+                      } else {
+                        console.log("kahit ano boi");
+                        req.session.message = {
+                          type: "danger",
+                          intro:
+                            "Your already added this subject please choose another one.!",
+                        };
+                        return res.redirect("/enrollSubject?course=" + c);
+                      }
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
     }
   );
 });

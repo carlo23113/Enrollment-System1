@@ -9,7 +9,9 @@
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Carlo University</title>
+    <link rel="icon" href="/logos/logo.svg">
 </head>
 
 <body onload="logo()">
@@ -38,9 +40,14 @@
                         <span class="link-text">Profile</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href=" /classmates" class="active"><i class="fas fa-users"></i>
+                    {{#each results}}
+                    <input type="hidden" value="{{course}}" id="course" name="course">
+                    <input type="hidden" value="{{section}}" id="section" name="section">
+                    {{/each}}
+                    <a href="javascript:void(0)" id="button" class="active"><i class="fas fa-users"></i>
                         <span class="link-text">Classmates</span></a>
                 </li>
+
                 <li class="nav-item">
                     <a href="/enroll"><i class="fas fa-address-card"></i>
                         <span class="link-text">Enroll Now</span></a>
@@ -67,6 +74,17 @@
     </div>
 
     <script>
+
+        $('#button').on('click', function () {
+            classmates();
+        });
+        const course = document.getElementById('course').value;
+        const section = document.getElementById('section').value;
+
+
+        function classmates() {
+            window.location.href = "/classmates?course=" + course + "&section=" + section;
+        }
 
         function logo() {
             document.getElementById('logo').style.opacity = 1;
